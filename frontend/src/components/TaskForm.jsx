@@ -69,6 +69,7 @@ export function TaskForm({ day, editing, onSubmit, onCancel, saving }) {
           placeholder="Finish the frontend"
           value={form.title}
           onChange={set("title")}
+          autoComplete="off"
           autoFocus
         />
       </div>
@@ -80,6 +81,7 @@ export function TaskForm({ day, editing, onSubmit, onCancel, saving }) {
           placeholder="Optional details…"
           value={form.description}
           onChange={set("description")}
+          autoComplete="off"
         />
       </div>
 

@@ -229,6 +229,7 @@ export function DayPopup({ open, onClose, date, initialAddTask = false, onChange
                 placeholder="Birthday, launch day, holiday…"
                 value={specialEvent}
                 onChange={(e) => setSpecialEvent(e.target.value)}
+                autoComplete="off"
               />
             </div>
 
