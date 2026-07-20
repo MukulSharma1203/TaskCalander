@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
-import { Check, Trash2 } from "lucide-react";
+import { Check, Pencil, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { PRIORITY_STYLES } from "@/lib/constants";
@@ -40,18 +40,23 @@ export function TaskItem({ task, index = 0, editing, onToggle, onEdit, onDelete 
       transition={{ delay: index * 0.02 }}
       className={cn(
         "group flex items-start gap-3 rounded-xl border border-white/5 bg-white/[0.02] p-3 transition-colors hover:border-white/10 hover:bg-white/[0.04]",
+        onToggle && "cursor-pointer",
         editing && "border-primary/40 bg-primary/5"
       )}
+      // The entire row toggles completion. Edit/delete live in their own
+      // buttons below and stopPropagation so they don't also fire a toggle.
+      onClick={onToggle ? handleToggle : undefined}
+      role={onToggle ? "button" : undefined}
+      aria-pressed={onToggle ? done : undefined}
     >
-      <button
-        onClick={handleToggle}
+      <span
         className={cn(
           "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-md border transition-all duration-200",
           done
             ? "border-emerald-500 bg-emerald-500 text-white"
-            : "border-white/20 hover:border-primary"
+            : "border-white/20 group-hover:border-primary"
         )}
-        aria-label="Toggle complete"
+        aria-hidden
       >
         <motion.span
           initial={false}
@@ -60,13 +65,9 @@ export function TaskItem({ task, index = 0, editing, onToggle, onEdit, onDelete 
         >
           <Check className="size-3.5" />
         </motion.span>
-      </button>
+      </span>
 
-      <button
-        onClick={() => onEdit?.(task)}
-        disabled={!onEdit}
-        className={cn("min-w-0 flex-1 text-left", onEdit && "cursor-pointer")}
-      >
+      <div className="min-w-0 flex-1 text-left">
         <span className="relative inline-block max-w-full align-bottom">
           <span
             className={cn(
@@ -97,11 +98,27 @@ export function TaskItem({ task, index = 0, editing, onToggle, onEdit, onDelete 
             {task.category} · {time}
           </span>
         </div>
-      </button>
+      </div>
+
+      {onEdit && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit(task);
+          }}
+          className="text-muted-foreground opacity-0 transition-opacity hover:text-primary group-hover:opacity-100"
+          aria-label="Edit task"
+        >
+          <Pencil className="size-4" />
+        </button>
+      )}
 
       {onDelete && (
         <button
-          onClick={() => onDelete(task)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(task);
+          }}
           className="text-muted-foreground opacity-0 transition-opacity hover:text-rose-400 group-hover:opacity-100"
           aria-label="Delete task"
         >
