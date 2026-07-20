@@ -90,7 +90,7 @@ export function Dashboard() {
       // Dashboard summary + the month's calendar days (for special-event markers)
       // in parallel.
       const [dash, cal] = await Promise.all([
-        api.get(`/dashboard/${monthKey(now)}`),
+        api.get(`/dashboard/${monthKey(now)}?today=${dayKey(now)}`),
         api
           .get(`/calendar/${month}?year=${year}`)
           .then((r) => r.data)

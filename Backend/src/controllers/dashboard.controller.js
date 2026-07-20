@@ -5,20 +5,25 @@ const dashboard = async (req, res) => {
   try {
     const [year, month] = req.params.month.split("-").map(Number);
 
-    const monthStart = new Date(year, month - 1, 1);
+    // Task `date` values are stored at UTC midnight of the user's calendar day,
+    // so every range here is built in UTC to match. The server's own timezone
+    // (UTC on Render, local on a dev machine) must not influence the result.
+    const monthStart = new Date(Date.UTC(year, month - 1, 1));
 
-    const monthEnd = new Date(year, month, 1);
+    const monthEnd = new Date(Date.UTC(year, month, 1));
 
-    const today = new Date();
+    // "Today" is the client's calendar day, passed as ?today=YYYY-MM-DD, since
+    // the server can't know the user's timezone. Fall back to the server's UTC
+    // day if it's missing.
+    const now = new Date();
+    const todayKey =
+      req.query.today ||
+      `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}-${String(now.getUTCDate()).padStart(2, "0")}`;
 
-    const todayStart = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate(),
-    );
+    const todayStart = new Date(`${todayKey}T00:00:00.000Z`);
 
     const tomorrow = new Date(todayStart);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
 
     const monthTasks = await Task.find({
       userId: req.user._id,
