@@ -103,8 +103,14 @@ const dashboard = async (req, res) => {
       }
     }
 
-    for (let i = heatmapData.length - 1; i >= 0; i--) {
-      if (heatmapData[i].completion >= 70) {
+    // Current streak walks backward from TODAY (not the last day that happens
+    // to have tasks). Future days — e.g. a task planned for tomorrow sitting at
+    // 0% — must never break or count toward the current streak, so ignore any
+    // day after today.
+    const pastOrToday = heatmapData.filter((d) => d.date <= todayKey);
+
+    for (let i = pastOrToday.length - 1; i >= 0; i--) {
+      if (pastOrToday[i].completion >= 70) {
         currentStreak++;
       } else {
         break;
