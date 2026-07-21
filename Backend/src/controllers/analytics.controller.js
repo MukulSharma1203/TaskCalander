@@ -135,9 +135,20 @@ export const monthlyAnalytics = async (req, res) => {
       dailyScores[key].push(task);
     });
 
+    // The trend graph only covers days up to the client's "today" — future
+    // days with planned (uncompleted) tasks would otherwise drag the line to
+    // zero. Same ?today=YYYY-MM-DD convention as the dashboard; fall back to
+    // the server's UTC day.
+    const now = new Date();
+    const todayKey =
+      req.query.today ||
+      `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}-${String(now.getUTCDate()).padStart(2, "0")}`;
+
     const graph = [];
 
     for (const day in dailyScores) {
+      if (day > todayKey) continue;
+
       graph.push({
         date: day,
         score: calculateScore(dailyScores[day]),

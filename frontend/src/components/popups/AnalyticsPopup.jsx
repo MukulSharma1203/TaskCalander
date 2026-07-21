@@ -272,7 +272,7 @@ function MonthlyView({ month, setMonth }) {
     setLoading(true);
     setError("");
     api
-      .get(`/analytics/month/${month}`)
+      .get(`/analytics/month/${month}?today=${dayKey(new Date())}`)
       .then((r) => setData(r.data))
       .catch((e) => setError(errMsg(e, "Could not load analytics")))
       .finally(() => setLoading(false));
